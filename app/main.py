@@ -1,6 +1,6 @@
 # internal
 from ast import Continue
-from containers import Container
+from app.containers import Container
 from controllers import cdqa
 
 #site-packages
