@@ -4,3 +4,7 @@
 venv
 
 __pycache__/
+*.ipynb
+
+# config 
+app_config.yaml
