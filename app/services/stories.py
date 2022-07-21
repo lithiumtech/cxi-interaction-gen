@@ -1,0 +1,2 @@
+class StoryBuilder:
+    pass

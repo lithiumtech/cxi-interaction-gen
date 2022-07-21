@@ -9,3 +9,13 @@ class DynoDb(object):
     def execute_query(self): 
         # make query executoin
         return
+
+    def put_item(self, tablename,item):
+        self.__client.put_item(
+            TableName=tablename,
+            Item=item
+        )
+        return
+
+    def create_item(self): 
+        return
