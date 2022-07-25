@@ -41,7 +41,6 @@ class Services(containers.DeclarativeContainer):
         resource = gateways.resource
     )
 
-
 class Application(containers.DeclarativeContainer):
     config = providers.Configuration(yaml_files = ["app_config.yaml"])
     services = providers.Container(
