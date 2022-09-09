@@ -1,6 +1,8 @@
 from enum import Enum,Flag, auto
 import numpy as np
 import pandas as pd
+from datetime import datetime,timedelta
+import time
 
 class EnumBase(Flag): 
     @classmethod
@@ -175,15 +177,20 @@ class DateDim:
     def __init__(self): 
         self.calendar = None
 
-    def create_date_table (self, start,end): 
+    def create_date_table (self, start=None,end=None):
+        if start is None: 
+            dates = self.__last_day(datetime.utcnow(),"sunday")
+            start = dates["start"]
+            end = dates["end"]
         df = pd.DataFrame({"Date": pd.date_range(start, end)})
-        df["Day"] = df.Date.dt.weekday_name
-        df["Week"] = df.Date.dt.weekofyear
+        df["Day"] = df.Date.dt.weekday
+        df["Week"] = df.Date.dt.isocalendar().week
         df["Quarter"] = df.Date.dt.quarter
         df["Year"] = df.Date.dt.year
         df["Year_half"] = (df.Quarter + 1) // 2
-        df.insert(0, 'Id', range(0, 0 + len(df)))
+        df.insert(1, 'Id', range(1, 1 + len(df)))
         self.calendar = df
+        print(df.head())
         return self
 
     def random_by_dist(self, proba:list):
@@ -210,3 +217,25 @@ class DateDim:
         for i in ids:
             dist.insert(i,probabilities[i])
         return dist
+
+    def __build_calendar(self): 
+        """
+        Assumptions: 
+            - 1 to 95
+            95 = the last Sunday that has just passed  
+            then go back in time to 1 
+        """
+
+        return
+
+    def __last_day(self,d, day_name):
+        days_of_week = ['sunday','monday','tuesday','wednesday',
+                            'thursday','friday','saturday']
+        target_day = days_of_week.index(day_name.lower())
+        delta_day = target_day - d.isoweekday()
+        if delta_day >= 0: delta_day -= 7 # go back 7 days
+        ds = {
+            "end": (d + timedelta(days=delta_day)).strftime("%Y-%m-%d"),
+            "start": (d + timedelta(days=delta_day - 94)).strftime("%Y-%m-%d")
+        }
+        return ds
