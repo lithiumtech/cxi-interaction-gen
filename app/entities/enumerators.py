@@ -172,7 +172,16 @@ class whatever:
         # weight a selection so if need to randomly select can do so
         return np.random.choice(np.array(list(cls.__dict__)), p = proba)
 
+class Agent: 
+    def __init__(self): 
+        self.__workflow = None
+        return
 
+    def opening(self): 
+        return self
+
+
+        
 class DateDim:
     def __init__(self): 
         self.calendar = None
@@ -189,8 +198,11 @@ class DateDim:
         df["Year"] = df.Date.dt.year
         df["Year_half"] = (df.Quarter + 1) // 2
         df.insert(1, 'Id', range(1, 1 + len(df)))
+
+        # friendly id
+        df["date_id"] = df.Date.apply(lambda x: x.strftime("%Y-%m-%d"))
         self.calendar = df
-        print(df.head())
+        
         return self
 
     def random_by_dist(self, proba:list):
@@ -201,10 +213,11 @@ class DateDim:
     def create_probability_dist(self, probabilities=None, start=None, end=None,date_list:list=None): 
         # create probability distribution for user based on start and end date or list of dates
 
-        if np.sum(probabilities)!=100: 
+        if np.sum(probabilities)!=1.0: 
             raise Exception("probabilities must add to 1.0")
 
-        dist = [0]*(len(self.calendar)-1)
+        dist = [0]*(self.calendar.shape[0])
+
         if date_list is None: 
             # use the date range
             # blank range
@@ -212,21 +225,11 @@ class DateDim:
             
         else: 
             # if random days provided instead 
-            ids = self.calendar(self.calendar.Date.isin(date_list)).copy()
-        
-        for i in ids:
-            dist.insert(i,probabilities[i])
+            ids = self.calendar[self.calendar.date_id.isin(date_list)].Id.tolist()
+        for i in range(0,len(ids)):
+
+            dist[ids[i]] = probabilities[i]
         return dist
-
-    def __build_calendar(self): 
-        """
-        Assumptions: 
-            - 1 to 95
-            95 = the last Sunday that has just passed  
-            then go back in time to 1 
-        """
-
-        return
 
     def __last_day(self,d, day_name):
         days_of_week = ['sunday','monday','tuesday','wednesday',
